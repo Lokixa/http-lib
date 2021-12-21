@@ -1,19 +1,11 @@
 #include <iostream>
-#include <boost/asio.hpp>
-#include <boost/array.hpp>
 #include <future>
 #include <chrono>
 #include <thread>
 #include "libs/logger/logger.hpp"
 #include "libs/client/client.hpp"
 
-using namespace boost;
-using asio::ip::tcp;
 using std::cout, std::endl;
-
-std::mutex connection_mutex;
-std::condition_variable cv;
-bool launched_server = false;
 
 logger LOG;
 void start_client();

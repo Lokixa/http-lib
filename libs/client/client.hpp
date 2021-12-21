@@ -7,24 +7,19 @@ namespace http
 {
     class client
     {
-        std::string_view VERSION = "1.1";
-        std::string_view USER_AGENT = "http-lib/0.0.1";
+        const std::string_view VERSION = "1.1";
+        const std::string_view USER_AGENT = "http-lib/0.0.1";
         boost::asio::io_context context;
         boost::asio::ip::tcp::socket socket;
-        boost::asio::ip::tcp::resolver resolver;
-        boost::system::error_code err_code;
         void send_get(std::string_view hostname, std::string_view page);
         void receive_get();
         void send(std::string_view message);
-        //TODO Provide proper support for logger or remove.
+        // TODO Provide proper support for logger or remove.
         logger LOG;
+        boost::system::error_code err_code;
 
     public:
-        client(logger &LOG) : context{},
-                              socket{context},
-                              resolver{context},
-                              err_code{},
-                              LOG{LOG} {}
+        client(logger &LOG);
         ~client();
         void get(std::string_view url);
     };

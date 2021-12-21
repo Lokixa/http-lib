@@ -2,6 +2,7 @@
 #include <string_view>
 #include <mutex>
 
+// TODO Rethink logger scope
 class logger
 {
     std::shared_ptr<std::mutex> in_use_mutex;
@@ -18,12 +19,13 @@ public:
         printf("%s\n", text.data());
         in_use_mutex->unlock();
     }
-    void operator()(std::wstring_view text)
+    void write(std::string_view text)
     {
+
         if (text.empty())
             return;
         in_use_mutex->lock();
-        printf("%s\n", text.data());
+        printf("%s", text.data());
         in_use_mutex->unlock();
     }
 };

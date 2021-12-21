@@ -9,7 +9,7 @@ void client::send(std::string_view message)
     size_t len = boost::asio::write(socket, boost::asio::buffer(message));
     // LOG("Wrote: " + std::to_string(len));
 }
-//TODO Add checking for page validity and clear whitespace
+// TODO Add checking for page validity and clear whitespace
 void client::send_get(std::string_view hostname, std::string_view page)
 {
     request req;
@@ -25,23 +25,28 @@ void client::send_get(std::string_view hostname, std::string_view page)
 }
 void client::receive_get()
 {
+    auto buf = boost::array<char, 16>();
     for (;;)
     {
-        boost::array<wchar_t, 512> buf;
         size_t len = boost::asio::read(socket, boost::asio::buffer(buf), err_code);
-        // LOG("Read: " + std::to_string(len));
         if (err_code == boost::asio::error::eof)
         {
-            LOG(std::wstring_view{buf.data(), len});
+            LOG.write(std::string_view{buf.data(), len});
             break;
         }
         else if (err_code)
         {
             throw boost::system::system_error(err_code);
         }
-        LOG(std::wstring_view{buf.data(), len});
+        LOG.write(std::string_view{buf.data(), len});
+        buf.fill(0);
     }
+    LOG.write("\n");
 }
+client::client(logger &log) : context{},
+                              socket{context},
+                              err_code{},
+                              LOG{log} {}
 client::~client()
 {
     context.stop();
@@ -50,7 +55,8 @@ client::~client()
 
 void client::get(std::string_view url)
 {
-    auto endpoints = resolver.resolve(url, "http", err_code);
+    auto resolver = std::make_unique<boost::asio::ip::tcp::resolver>(context);
+    auto endpoints = resolver->resolve(url, "http", err_code);
     boost::asio::connect(socket, endpoints);
     size_t pos = url.find('/');
     std::string_view page;

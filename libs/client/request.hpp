@@ -22,17 +22,25 @@ namespace http
             message.append(http_version);
             message.append(crlf);
 
-            message.append("User-Agent: ");
-            message.append(user_agent);
-            message.append(crlf);
+            if (!user_agent.empty())
+            {
+                message.append("User-Agent: ");
+                message.append(user_agent);
+                message.append(crlf);
+            }
 
-            message.append("Host: ");
-            message.append(hostname);
-            message.append(crlf);
-
-            message.append("Accept-Language: ");
-            message.append(accept_language);
-            message.append(crlf);
+            if (!hostname.empty())
+            {
+                message.append("Host: ");
+                message.append(hostname);
+                message.append(crlf);
+            }
+            if (!accept_language.empty())
+            {
+                message.append("Accept-Language: ");
+                message.append(accept_language);
+                message.append(crlf);
+            }
 
             // To end message
             message.append(crlf);
