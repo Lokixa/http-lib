@@ -1,55 +1,33 @@
 #include <iostream>
-#include <future>
-#include <chrono>
-#include <thread>
-#include "libs/logger/logger.hpp"
-#include "libs/client/client.hpp"
+#include "logger.hpp"
+#include "client.hpp"
 
 using std::cout, std::endl;
 
-logger LOG;
-void start_client();
-void start_client(std::string_view hostname);
+void start_client(std::string_view, std::shared_ptr<logger::logger>);
 int main(int argc, char *argv[])
 {
+    auto logger = std::make_shared<logger::logger>();
     try
     {
         if (argc > 1)
         {
-            start_client(argv[argc - 1]);
+            start_client(argv[argc - 1], logger);
         }
         else
         {
-            start_client();
+            start_client("http://localhost/", logger);
         }
     }
     catch (std::exception &e)
     {
-        cout << e.what() << endl;
+        logger->logln("Exception: ");
+        logger->logln(e.what());
     }
     return 0;
 }
-void start_client()
+void start_client(std::string_view hostname, std::shared_ptr<logger::logger> logger)
 {
-    try
-    {
-        http::client client(LOG);
-        client.get("127.0.0.1");
-    }
-    catch (std::exception &e)
-    {
-        LOG(e.what());
-    }
-}
-void start_client(std::string_view hostname)
-{
-    try
-    {
-        http::client client(LOG);
-        client.get(hostname);
-    }
-    catch (std::exception &e)
-    {
-        LOG(e.what());
-    }
+    http::client client(logger);
+    client.get(hostname);
 }
