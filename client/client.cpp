@@ -45,20 +45,7 @@ client::client(std::shared_ptr<logger::logger> logger) : context{},
 void client::get(std::string_view url)
 {
     auto endpoints = resolver.resolve(request::get_hostname(url), "http", err_code);
-    {
-        auto bendpoints = resolver.resolve(request::get_hostname(url), "http", err_code);
-        if (err_code)
-        {
-            throw boost::system::system_error{err_code};
-        }
-    }
-    {
-        auto bendpoints = resolver.resolve(request::get_hostname(url), "http", err_code);
-        if (err_code)
-        {
-            throw boost::system::system_error{err_code};
-        }
-    }
+
     if (err_code)
     {
         throw boost::system::system_error{err_code};
@@ -70,7 +57,9 @@ void client::get(std::string_view url)
     }
 
     request req{url};
+    req.connection = "close";
     std::string request = req.get();
+    logger->log(request);
     send(request);
     receive_get();
 }

@@ -3,9 +3,19 @@
 
 namespace http
 {
-
-    request::request(std::string_view url) : hostname{get_hostname(url)}, resource{get_resource(url)}
+    const char *crlf = "\r\n";
+    request::request(std::string_view url) : host{get_hostname(url)},
+                                             resource{get_resource(url)}
     {
+    }
+    void try_append_header(std::string &string, std::string_view header_name, std::string_view header)
+    {
+        if (!header.empty())
+        {
+            string.append(header_name);
+            string.append(header);
+            string.append(crlf);
+        }
     }
 
     std::string request::get()
@@ -22,25 +32,10 @@ namespace http
         message.append(HTTP_VERSION);
         message.append(crlf);
 
-        if (!user_agent.empty())
-        {
-            message.append("User-Agent: ");
-            message.append(user_agent);
-            message.append(crlf);
-        }
-
-        if (!hostname.empty())
-        {
-            message.append("Host: ");
-            message.append(hostname);
-            message.append(crlf);
-        }
-        if (!accept_language.empty())
-        {
-            message.append("Accept-Language: ");
-            message.append(accept_language);
-            message.append(crlf);
-        }
+        try_append_header(message, "User-Agent: ", user_agent);
+        try_append_header(message, "Host: ", host);
+        try_append_header(message, "Accept-Language: ", accept_language);
+        try_append_header(message, "Connection: ", connection);
 
         // To end message
         message.append(crlf);

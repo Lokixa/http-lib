@@ -6,7 +6,7 @@
 #define HTTP_VERSION "HTTP/1.1"
 #endif
 #ifndef USER_AGENT
-#define USER_AGENT "httplib"
+#define USER_AGENT "http-lib/0.0.1"
 #endif
 namespace http
 {
@@ -26,9 +26,39 @@ namespace http
         //     TRACE
         // };
 
-        std::string_view hostname;
-        std::string_view resource;
+        // Control
 
+        std::string_view expect;
+        std::string_view host;
+        std::string_view max_forwards;
+        std::string_view pragma;
+        std::string_view range;
+        std::string_view transfer_codings;
+
+        // Conditional
+
+        std::string_view if_match;
+        std::string_view if_none_match;
+        std::string_view if_modified_since;
+        std::string_view if_unmodified_since;
+        std::string_view if_range;
+
+        // Content Negotiation
+
+        std::string_view accept;
+        std::string_view accept_charset;
+        std::string_view accept_encoding;
+        std::string_view accept_language;
+
+        // Authentication Credentials
+
+        std::string_view authorization;
+        std::string_view proxy_authorization;
+
+        // Request Context
+
+        std::string_view from;
+        std::string_view referer;
         std::string_view user_agent = USER_AGENT;
 
         request(std::string_view url);
@@ -37,5 +67,8 @@ namespace http
 
         static std::string_view get_hostname(std::string_view url);
         static std::string_view get_resource(std::string_view url);
+
+    private:
+        std::string_view resource;
     };
 };
