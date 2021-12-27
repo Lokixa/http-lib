@@ -69,5 +69,12 @@ void client::close()
 }
 client::~client()
 {
-    this->close();
+    try
+    {
+        this->close();
+    }
+    catch (std::exception &e)
+    {
+        logger::logln("Caught exception on close: " + std::string{e.what()});
+    }
 }

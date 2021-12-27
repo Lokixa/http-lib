@@ -3,14 +3,16 @@
 #include <mutex>
 
 // TODO Rethink logger scope
-class logger
+class logger final
 {
     static std::mutex in_use_mutex;
 
-public:
+    // Singleton class
     logger() = delete;
     logger(logger &) = delete;
     logger(logger &&) = delete;
+
+public:
     static void log(std::string_view text)
     {
         in_use_mutex.lock();

@@ -15,6 +15,7 @@ namespace http
 
     public:
         client();
+        // TODO Return response
         void get(std::string_view url);
         ~client();
         void close();
