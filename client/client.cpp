@@ -22,23 +22,22 @@ void client::receive_get()
         size_t len = boost::asio::read(socket, boost::asio::buffer(buf), err_code);
         if (err_code == boost::asio::error::eof)
         {
-            logger->log(std::string_view{buf.data(), len});
+            logger::log(std::string_view{buf.data(), len});
             break;
         }
         else if (err_code)
         {
             throw boost::system::system_error{err_code};
         }
-        logger->log(std::string_view{buf.data(), len});
+        logger::log(std::string_view{buf.data(), len});
         buf.fill(0);
     }
-    logger->log("\n");
+    logger::log("\n");
 }
-client::client(std::shared_ptr<logger::logger> logger) : context{},
-                                                         socket{context},
-                                                         resolver{context},
-                                                         err_code{},
-                                                         logger{logger}
+client::client() : context{},
+                   socket{context},
+                   resolver{context},
+                   err_code{}
 {
 }
 
@@ -59,7 +58,7 @@ void client::get(std::string_view url)
     request req{url};
     req.connection = "close";
     std::string request = req.get();
-    logger->log(request);
+    logger::log(request);
     send(request);
     receive_get();
 }

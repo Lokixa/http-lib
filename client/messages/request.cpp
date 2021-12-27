@@ -50,13 +50,21 @@ namespace http
             throw std::runtime_error{"Invalid url: No \'://\'"};
         }
         std::string_view hostname = url.substr(after_prefix);
-        hostname.remove_suffix(hostname.size() - hostname.find('/'));
+        size_t resource_start = hostname.find('/');
+        // If found resource, trim it
+        if (resource_start != hostname.npos)
+            hostname.remove_suffix(hostname.size() - resource_start);
         return hostname;
     }
     std::string_view request::get_resource(std::string_view url)
     {
         size_t after_prefix = url.find("://") + 3;
         size_t after_hostname = url.find_first_of("/", after_prefix);
+        // No resource, e.g. https://localhost -> '/'
+        if (after_hostname == url.npos)
+        {
+            return "/";
+        }
         return url.substr(after_hostname);
     }
 

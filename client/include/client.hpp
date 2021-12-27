@@ -12,10 +12,9 @@ namespace http
         void receive_get();
         void send(std::string_view message);
         boost::system::error_code err_code;
-        std::shared_ptr<logger::logger> logger;
 
     public:
-        client(std::shared_ptr<logger::logger>);
+        client();
         void get(std::string_view url);
         ~client();
         void close();
