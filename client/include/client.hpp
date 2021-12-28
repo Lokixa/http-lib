@@ -1,24 +1,28 @@
 #pragma once
 #include <boost/asio.hpp>
+#include <memory>
 #include "logger.hpp"
+#include "response.hpp"
 
 namespace http
 {
-    class client
+    struct client
     {
+        client(std::shared_ptr<logger::logger>);
+        // TODO Return response
+        http::response get(const std::string &url);
+        ~client();
+        void close();
+
+    private:
+        http::response receive();
+        void send(std::string_view message);
+
         boost::asio::io_context context;
         boost::asio::ip::tcp::socket socket;
         boost::asio::ip::tcp::resolver resolver;
-        void receive_get();
-        void send(std::string_view message);
         boost::system::error_code err_code;
-
-    public:
-        client();
-        // TODO Return response
-        void get(std::string_view url);
-        ~client();
-        void close();
+        std::shared_ptr<logger::logger> logger;
     };
 
 };

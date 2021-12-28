@@ -14,46 +14,44 @@ void client::send(std::string_view message)
         throw boost::system::system_error{err_code};
     }
 }
-void log_data(const char *const data, size_t len)
-{
-    logger::log(std::string_view{data, len});
-}
 
-void client::receive_get()
+http::response client::receive()
 {
     auto buf = boost::array<char, 512>();
-    // http::response response{};
+    std::string response;
     for (;;)
     {
         size_t len = boost::asio::read(socket, boost::asio::buffer(buf), err_code);
 
-        // response = response.proccess(buf);
-
         // End
         if (err_code == boost::asio::error::eof)
         {
-            log_data(buf.data(), len);
+            response.append(buf.data(), len);
             break;
         }
         else if (err_code)
         {
             throw boost::system::system_error{err_code};
         }
-        log_data(buf.data(), len);
+        response.append(buf.data(), len);
+
+        // Reuse buffer
         buf.fill(0);
     }
-    logger::log("\n");
+    return http::response::parse(response);
 }
-client::client() : context{},
-                   socket{context},
-                   resolver{context},
-                   err_code{}
+client::client(std::shared_ptr<logger::logger> logger) : context{},
+                                                         socket{context},
+                                                         resolver{context},
+                                                         err_code{},
+                                                         logger{logger}
 {
 }
 
-void client::get(std::string_view url)
+http::response client::get(const std::string &url)
 {
-    auto endpoints = resolver.resolve(request::get_hostname(url), "http", err_code);
+    request req{url};
+    auto endpoints = resolver.resolve(req["Host"], req["Protocol"], err_code);
 
     if (err_code)
     {
@@ -65,12 +63,11 @@ void client::get(std::string_view url)
         throw boost::system::system_error{err_code};
     }
 
-    request req{url};
-    req.connection = "close";
+    req["Connection"] = "close";
     std::string request = req.get();
-    logger::log(request);
+    logger->log(request);
     send(request);
-    receive_get();
+    return receive();
 }
 void client::close()
 {
@@ -85,6 +82,6 @@ client::~client()
     }
     catch (std::exception &e)
     {
-        logger::logln("Caught exception on close: " + std::string{e.what()});
+        logger->logln("Caught exception on close: " + std::string{e.what()});
     }
 }

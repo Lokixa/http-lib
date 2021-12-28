@@ -1,60 +1,74 @@
 #include <iostream>
 #include "logger.hpp"
 #include "client.hpp"
+#include <vector>
 #include <future>
 #include <locale>
+#include <string_view>
+#include <memory>
 
 using std::cout, std::endl;
 
-void start(std::string_view);
-int main(int argc, char *argv[])
+class Tests
 {
-    try
+    void start()
     {
-        std::locale::global(std::locale(""));
-        logger::logln("Changed locale to: " + std::locale().name());
-        std::cout.imbue(std::locale());
+        generic_test();
+    }
+    void generic_test()
+    {
+        http::client client{logger};
+        http::response response = client.get(hostname);
+        for (auto &&[key, value] : response.headers)
+        {
+            logger->logln(key + ": " + value);
+        }
+        logger->logln();
+        logger->log(response.body);
+    }
+
+    // void async_test()
+    // {
+    //     std::vector<std::future<void>> futures;
+    //     for (size_t i = 0; i < 10; ++i)
+    //     {
+    //         logger->logln("Starting a task");
+    //         futures.push_back(
+    //             std::async(generic_test));
+    //     }
+    //     for (const auto &future : futures)
+    //     {
+    //         future.wait();
+    //     }
+    // }
+
+public:
+    std::shared_ptr<logger::logger> logger;
+    std::string hostname = "http://localhost/";
+    Tests(int argc, char *argv[]) : logger{new logger::logger{}}
+    {
         if (argc > 1)
         {
-            start(std::string{argv[argc - 1]});
+            hostname = std::string{argv[argc - 1]};
         }
-        else
+    };
+    int run()
+    {
+        try
         {
-            start("http://localhost/");
+            start();
         }
-    }
-    catch (std::exception &e)
-    {
-        logger::logln("Exception: ");
-        logger::logln(e.what());
-    }
-    return 0;
-}
-void generic_test(std::string_view hostname);
-void async_test(std::string_view hostname);
-void start(std::string_view hostname)
-{
-    // async_test(hostname);
-    generic_test(hostname);
-}
-void generic_test(std::string_view hostname)
-{
-    http::client client{};
-    client.get(hostname);
-}
+        catch (std::exception &e)
+        {
+            logger->logln("Exception: ");
+            logger->logln(e.what());
+        }
 
-// More to test out external singleton classes
-void async_test(std::string_view hostname)
+        return 0;
+    }
+};
+int main(int argc, char *argv[])
 {
-    std::vector<std::future<void>> futures;
-    for (size_t i = 0; i < 10; ++i)
-    {
-        logger::logln("Starting a task");
-        futures.push_back(
-            std::async(generic_test, hostname));
-    }
-    for (const auto &future : futures)
-    {
-        future.wait();
-    }
+    Tests tests{argc, argv};
+    return tests.run();
 }

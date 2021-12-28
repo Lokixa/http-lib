@@ -1,38 +1,29 @@
 #pragma once
-#include "base_message.hpp"
+#include <string>
+#include <map>
 namespace http
 {
-    struct response : base_message
+    enum class statuscode;
+    struct response
     {
-        // [https://www.rfc-editor.org/rfc/rfc7231#section-7]
-        // Control Data
 
-        std::string_view age;
-        std::string_view expires;
-        std::string_view date;
-        std::string_view location;
-        std::string_view retry_after;
-        std::string_view vary;
-        std::string_view warning;
+        /**     
+         * @brief Parses message and appends to itself
+         *
+         * @param message
+         */
+        std::map<std::string, std::string> headers;
+        std::string body;
+        statuscode status_code;
+        std::string http_version;
+        //TODO Add stream support
+        static const response parse(const std::string &);
 
-        // Validator
-
-        std::string_view etag;
-        std::string_view last_modified;
-
-        // Auth challenges
-
-        std::string_view www_authenticate;
-        std::string_view proxy_authenticate;
-
-        // Context
-
-        std::string_view accept_ranges;
-        std::string_view allow;
-        std::string_view server;
+        // private:
+        //     void parse(std::string_view message);
     };
-    // [https://www.rfc-editor.org/rfc/rfc7231#section-6]
-    enum class statuscodes
+    // https://www.rfc-editor.org/rfc/rfc7231#section-6
+    enum class statuscode
     {
         Continue = 100,
         SwitchingProtocols,
