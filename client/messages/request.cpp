@@ -29,7 +29,7 @@ namespace http
         }
         message.append(resource);
         message.append(" ");
-        message.append(HTTP_VERSION);
+        message.append(http_version);
         message.append(crlf);
 
         try_append_header(message, "User-Agent: ", user_agent);

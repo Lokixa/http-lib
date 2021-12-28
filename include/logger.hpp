@@ -1,6 +1,6 @@
 #pragma once
-#include <string_view>
 #include <mutex>
+#include <iostream>
 
 // TODO Rethink logger scope
 class logger final
@@ -16,17 +16,13 @@ public:
     static void log(std::string_view text)
     {
         in_use_mutex.lock();
-        printf("%s", text.data());
+        std::cout << text;
         in_use_mutex.unlock();
     }
     static void logln(std::string_view text)
     {
-        log(std::string{text} + '\n');
-    }
-    static void log(char c)
-    {
         in_use_mutex.lock();
-        putc(c, stdout);
+        std::cout << text << '\n';
         in_use_mutex.unlock();
     }
 };

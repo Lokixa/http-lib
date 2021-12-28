@@ -1,10 +1,12 @@
 #pragma once
-#include <string_view>
+#include <string>
 
 namespace http
 {
     struct base_message
     {
+        // TODO Refactor
+        std::string_view http_version = "HTTP/1.1";
         // [https://www.rfc-editor.org/rfc/rfc7231]
         // Representation Metadata
 

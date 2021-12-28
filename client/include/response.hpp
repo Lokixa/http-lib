@@ -1,10 +1,10 @@
 #pragma once
-#include <string_view>
 #include "base_message.hpp"
 namespace http
 {
     struct response : base_message
     {
+        // [https://www.rfc-editor.org/rfc/rfc7231#section-7]
         // Control Data
 
         std::string_view age;
@@ -31,6 +31,7 @@ namespace http
         std::string_view allow;
         std::string_view server;
     };
+    // [https://www.rfc-editor.org/rfc/rfc7231#section-6]
     enum class statuscodes
     {
         Continue = 100,

@@ -1,5 +1,6 @@
 #include "client.hpp"
 #include "request.hpp"
+#include "response.hpp"
 #include <boost/array.hpp>
 
 using boost::asio::ip::tcp;
@@ -13,23 +14,32 @@ void client::send(std::string_view message)
         throw boost::system::system_error{err_code};
     }
 }
+void log_data(const char *const data, size_t len)
+{
+    logger::log(std::string_view{data, len});
+}
 
 void client::receive_get()
 {
     auto buf = boost::array<char, 512>();
+    // http::response response{};
     for (;;)
     {
         size_t len = boost::asio::read(socket, boost::asio::buffer(buf), err_code);
+
+        // response = response.proccess(buf);
+
+        // End
         if (err_code == boost::asio::error::eof)
         {
-            logger::log(std::string_view{buf.data(), len});
+            log_data(buf.data(), len);
             break;
         }
         else if (err_code)
         {
             throw boost::system::system_error{err_code};
         }
-        logger::log(std::string_view{buf.data(), len});
+        log_data(buf.data(), len);
         buf.fill(0);
     }
     logger::log("\n");

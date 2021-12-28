@@ -1,2 +1,2 @@
 all:
-	sudo python3 -m http.server --bind 127.0.0.1 80
+	sudo http-server -a 127.0.0.1 -p 80

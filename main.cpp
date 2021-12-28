@@ -2,6 +2,7 @@
 #include "logger.hpp"
 #include "client.hpp"
 #include <future>
+#include <locale>
 
 using std::cout, std::endl;
 
@@ -10,6 +11,9 @@ int main(int argc, char *argv[])
 {
     try
     {
+        std::locale::global(std::locale(""));
+        logger::logln("Changed locale to: " + std::locale().name());
+        std::cout.imbue(std::locale());
         if (argc > 1)
         {
             start(std::string{argv[argc - 1]});
@@ -30,7 +34,8 @@ void generic_test(std::string_view hostname);
 void async_test(std::string_view hostname);
 void start(std::string_view hostname)
 {
-    async_test(hostname);
+    // async_test(hostname);
+    generic_test(hostname);
 }
 void generic_test(std::string_view hostname)
 {

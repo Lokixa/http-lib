@@ -1,10 +1,7 @@
 #pragma once
-#include <string>
 #include "base_message.hpp"
 
-#ifndef HTTP_VERSION
-#define HTTP_VERSION "HTTP/1.1"
-#endif
+// TODO Change to const or refactor
 #ifndef USER_AGENT
 #define USER_AGENT "http-lib/0.0.1"
 #endif
