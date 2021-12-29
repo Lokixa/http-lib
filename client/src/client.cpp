@@ -6,16 +6,8 @@
 using boost::asio::ip::tcp;
 using namespace http;
 const char *crlf = "\r\n";
-void client::send(std::string_view message)
-{
-    boost::asio::write(socket, boost::asio::buffer(message), err_code);
-    if (err_code)
-    {
-        throw boost::system::system_error{err_code};
-    }
-}
 
-http::response client::receive()
+http::response receive(tcp::socket &socket, boost::system::error_code &err_code)
 {
     auto buf = boost::array<char, 512>();
     std::string response;
@@ -66,8 +58,12 @@ http::response client::get(const std::string &url)
     req["Connection"] = "close";
     std::string request = req.get();
     logger->log(request);
-    send(request);
-    return receive();
+    boost::asio::write(socket, boost::asio::buffer(request), err_code);
+    if (err_code)
+    {
+        throw boost::system::system_error{err_code};
+    }
+    return receive(socket, err_code);
 }
 void client::close()
 {
