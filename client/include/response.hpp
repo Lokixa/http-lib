@@ -17,10 +17,7 @@ struct response
     statuscode status_code;
     std::string http_version;
     std::string my_string;
-    // TODO Add stream support
+    // TODO(#3): Add stream support
     static const response parse(const std::string &);
-
-    // private:
-    //     void parse(std::string_view message);
 };
 }; // namespace http
