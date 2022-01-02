@@ -11,8 +11,6 @@
 #include <type_traits>
 #include <vector>
 
-using std::cout, std::endl;
-
 class Tests
 {
     void start()

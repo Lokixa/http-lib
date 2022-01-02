@@ -1,5 +1,9 @@
 cmake_minimum_required(VERSION 3.22)
 project(http-lib VERSION 0.0.1 LANGUAGES CXX)
+
+include(cmake/CPM.cmake)
+cpmaddpackage("gh:TheLartians/Format.cmake@1.7.3")
+
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_CXX_COMPILER /usr/bin/clang++)
 set(CMAKE_CXX_STANDARD 17)
