@@ -2,12 +2,11 @@
 #include <map>
 #include <string>
 
-// TODO Change to const or refactor
 namespace http
 {
 struct request
 {
-    // TODO Implement fully
+    // TODO(#5): Implement fully
     // [https://www.rfc-editor.org/rfc/rfc7231#section-4]
     // enum class methods
     // {
