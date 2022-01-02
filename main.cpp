@@ -1,11 +1,15 @@
-#include <iostream>
-#include "logger.hpp"
 #include "client.hpp"
-#include <vector>
+#include "logger.hpp"
+#include "response.hpp"
+#include "tlsclient.hpp"
+
 #include <future>
+#include <iostream>
 #include <locale>
-#include <string_view>
 #include <memory>
+#include <string_view>
+#include <type_traits>
+#include <vector>
 
 using std::cout, std::endl;
 
@@ -17,8 +21,7 @@ class Tests
     }
     void generic_test()
     {
-        http::client client{logger};
-        http::response response = client.get(hostname);
+        http::response response = client->get(*hostname);
         for (auto &&[key, value] : response.headers)
         {
             logger->logln(key + ": " + value);
@@ -42,18 +45,15 @@ class Tests
     //     }
     // }
 
-public:
+  public:
     std::shared_ptr<logger::logger> logger;
-    std::string hostname = "http://localhost/";
-    Tests(int argc, char *argv[]) : logger{new logger::logger{}}
+    std::unique_ptr<http::client> client;
+    std::unique_ptr<std::string> hostname;
+    Tests(std::unique_ptr<http::client> &&client)
+        : logger{new logger::logger{}}, client{std::move(client)}, hostname{} {};
+    int run(const std::string &hostname)
     {
-        if (argc > 1)
-        {
-            hostname = std::string{argv[argc - 1]};
-        }
-    };
-    int run()
-    {
+        this->hostname = std::make_unique<std::string>(hostname);
         try
         {
             start();
@@ -69,6 +69,14 @@ public:
 };
 int main(int argc, char *argv[])
 {
-    Tests tests{argc, argv};
-    return tests.run();
+    std::string hostname = "localhost";
+    if (argc > 1)
+    {
+        hostname = std::string{argv[argc - 1]};
+    }
+    Tests tests{std::make_unique<http::client>()};
+    tests.run("http://" + hostname);
+    Tests tlstests{std::make_unique<http::tlsclient>()};
+    tlstests.run("https://" + hostname);
+    return 0;
 }

@@ -1,10 +1,13 @@
 #include "client.hpp"
-#include "request.hpp"
-#include "response.hpp"
+
 #include <boost/array.hpp>
 
+#include "request.hpp"
+#include "response.hpp"
+
+namespace http
+{
 using boost::asio::ip::tcp;
-using namespace http;
 const char *crlf = "\r\n";
 
 http::response receive(tcp::socket &socket, boost::system::error_code &err_code)
@@ -32,11 +35,7 @@ http::response receive(tcp::socket &socket, boost::system::error_code &err_code)
     }
     return http::response::parse(response);
 }
-client::client(std::shared_ptr<logger::logger> logger) : context{},
-                                                         socket{context},
-                                                         resolver{context},
-                                                         err_code{},
-                                                         logger{logger}
+client::client() : context{}, socket{context}, resolver{context}, err_code{}
 {
 }
 
@@ -56,8 +55,9 @@ http::response client::get(const std::string &url)
     }
 
     req["Connection"] = "close";
+
     std::string request = req.get();
-    logger->log(request);
+
     boost::asio::write(socket, boost::asio::buffer(request), err_code);
     if (err_code)
     {
@@ -78,6 +78,6 @@ client::~client()
     }
     catch (std::exception &e)
     {
-        logger->logln("Caught exception on close: " + std::string{e.what()});
     }
 }
+}; // namespace http
