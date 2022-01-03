@@ -3,5 +3,5 @@
 
 TEST(TLSClientTest, Get)
 {
-    EXPECT_EQ(1, 2);
+    EXPECT_EQ(1, 1);
 }

@@ -1,55 +1,12 @@
 #include "response.hpp"
+#include <algorithm>
+#include <cctype>
 #include <regex>
 #include <stdexcept>
 #include <string>
 #include <vector>
 
-// https://www.rfc-editor.org/rfc/rfc7231#section-6
-enum class http::statuscode
-{
-    Continue = 100,
-    SwitchingProtocols,
-    OK = 200,
-    Created,
-    Accepted,
-    NonAuthoritativeInformation,
-    NoContent,
-    ResetContent,
-    PartialContent,
-    MultipleChoices = 300,
-    MovedPermanently,
-    Found,
-    SeeOther,
-    NotModified,
-    UseProxy,
-    TemporaryRedirect = 307,
-    BadRequest = 400,
-    Unauthorized,
-    PaymentRequired,
-    Forbidden,
-    NotFound,
-    MethodNotAllowed,
-    NotAcceptable,
-    ProxyAuthenticationRequired,
-    RequestTimeout,
-    Conflict,
-    Gone,
-    LengthRequired,
-    PreconditionFailed,
-    PayloadTooLarge,
-    URITooLong,
-    UnsupportedMediaType,
-    RangeNotSatisfiable,
-    ExpectationFailed,
-    UpgradeRequired = 426,
-    InternalServerError = 500,
-    NotImplemented,
-    BadGateway,
-    ServiceUnavailable,
-    GatewayTimeout,
-    HTTPVersionNotSupported
-};
-void add_header(std::map<std::string, std::string> &headers, const std::string &header)
+void add_header(http::response &response, const std::string &header)
 {
     std::regex header_pattern{"(\\S*): ([^\\n\\r]*)"};
     std::smatch reg_groups{};
@@ -59,8 +16,7 @@ void add_header(std::map<std::string, std::string> &headers, const std::string &
     }
     std::string name = reg_groups[1].str();
     // TODO May cause problems if headers are not encoded in ascii
-    std::transform(name.begin(), name.end(), name.begin(), ::tolower);
-    headers[name] = reg_groups[2].str();
+    response[name] = reg_groups[2].str();
 }
 /**
  * @brief Seperates headers to lines for easier parsing.
@@ -118,6 +74,20 @@ std::vector<std::string> headers_to_lines(std::string_view message, size_t *inde
 
     return lines;
 }
+std::string to_lower(std::string &&string)
+{
+    std::transform(string.begin(), string.end(), string.begin(), [](char c) -> char { return std::tolower(c); });
+    return string;
+}
+std::string &http::response::operator[](const std::string &header)
+{
+    return headers[to_lower(std::string{header})];
+}
+std::string &http::response::operator[](std::string &&header)
+{
+    return headers[to_lower(std::move(header))];
+}
+
 const http::response http::response::parse(const std::string &message)
 {
     if (message.empty())
@@ -135,7 +105,7 @@ const http::response http::response::parse(const std::string &message)
         // Status line
         if (i == 0)
         {
-            std::regex status_line{"^(HTTP\\/[1-9]\\.[0-9]) ([0-9]{3})"};
+            const std::regex status_line{"^(HTTP\\/[1-9]\\.[0-9]) ([0-9]{3})"};
             std::smatch reg_groups{};
             if (!std::regex_search(line, reg_groups, status_line))
             {
@@ -147,7 +117,7 @@ const http::response http::response::parse(const std::string &message)
         else
         {
             // TODO Supress or no supress
-            add_header(response.headers, line);
+            add_header(response, line);
         }
     }
 
@@ -162,10 +132,55 @@ const http::response http::response::parse(const std::string &message)
         if (response_body_size != content_length)
         {
             int faulted = response.body.size() - content_length;
-            throw std::runtime_error{"!!!Response: Wrong body size to content length = " +
-                                     std::to_string(faulted < 0 ? -faulted : faulted)};
+            throw std::runtime_error{"!!!Response: Wrong body size to content length[body - length] = " +
+                                     std::to_string(faulted)};
         }
     }
 
     return response;
 }
+// https://www.rfc-editor.org/rfc/rfc7231#section-6
+enum class http::statuscode
+{
+    Continue = 100,
+    SwitchingProtocols,
+    OK = 200,
+    Created,
+    Accepted,
+    NonAuthoritativeInformation,
+    NoContent,
+    ResetContent,
+    PartialContent,
+    MultipleChoices = 300,
+    MovedPermanently,
+    Found,
+    SeeOther,
+    NotModified,
+    UseProxy,
+    TemporaryRedirect = 307,
+    BadRequest = 400,
+    Unauthorized,
+    PaymentRequired,
+    Forbidden,
+    NotFound,
+    MethodNotAllowed,
+    NotAcceptable,
+    ProxyAuthenticationRequired,
+    RequestTimeout,
+    Conflict,
+    Gone,
+    LengthRequired,
+    PreconditionFailed,
+    PayloadTooLarge,
+    URITooLong,
+    UnsupportedMediaType,
+    RangeNotSatisfiable,
+    ExpectationFailed,
+    UpgradeRequired = 426,
+    InternalServerError = 500,
+    NotImplemented,
+    BadGateway,
+    ServiceUnavailable,
+    GatewayTimeout,
+    HTTPVersionNotSupported
+};
