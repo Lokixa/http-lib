@@ -1,3 +1,0 @@
-add_executable(httpclient_tests tests_main.cpp client_test.cpp response_test.cpp)
-target_link_libraries(httpclient_tests gtest httpclient)
-gtest_discover_tests(httpclient_tests)

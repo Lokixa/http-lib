@@ -1,6 +1,5 @@
 all: build
-	clear
-	ctest
+	ctest --output-on-failure
 
 mem: build
 	clear
@@ -10,4 +9,5 @@ build: clean
 	ninja
 
 clean:
+	clear
 	ninja -t cleandead

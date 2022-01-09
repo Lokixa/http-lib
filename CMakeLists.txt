@@ -24,6 +24,6 @@ if(${COMPILE_TESTS})
     include(GoogleTest)
 endif()
 
-add_subdirectory(client)
+add_subdirectory(httpclient)
 
-add_subdirectory(tlsclient)
+add_subdirectory(tls)

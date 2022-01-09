@@ -30,7 +30,7 @@ const std::string str_response{"HTTP/1.1 200 OK\r\n"
                                "</html>"};
 class ResponseTest : public ::testing::Test
 {
-  protected:
+protected:
     void SetUp() override
     {
         try
@@ -63,6 +63,3 @@ TEST_F(ResponseTest, Valid)
                                                              << print_headers(response);
     EXPECT_NE(response.body.find("Здраствуйте"), response.body.npos);
 }
-/* TEST_F(ResponseTest, ValidBody) */
-/* { */
-/* } */

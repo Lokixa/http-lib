@@ -5,8 +5,9 @@ const options = {
     key : fs.readFileSync('key.pem'),
     cert : fs.readFileSync('cert.pem')
 };
+const host = "localhost";
 
-console.log('Started on localhost:443!');
+console.log(`Started on ${host}:443!`);
 https
     .createServer(options,
                   function(req, res) {
@@ -16,4 +17,4 @@ https
                       let now = new Date();
                       console.log(`[${now.getHours()}:${now.getMinutes()}] ${req.headers['user-agent']}`);
                   })
-    .listen(443, 'localhost');
+    .listen(443, host);
