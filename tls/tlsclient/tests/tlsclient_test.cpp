@@ -11,12 +11,13 @@ protected:
     }
     std::unique_ptr<http::client> client;
 };
+const char *const toPing = "https://lyubenk.com";
 
 TEST_F(TLSTest, GetDNS)
 {
     try
     {
-        http::response response = client->get("https://example.com");
+        http::response response = client->get(toPing);
         EXPECT_EQ((int)response.status_code, 200) << "Actual status: " << (int)response.status_code;
     }
     catch (std::exception &e)
@@ -29,11 +30,11 @@ TEST_F(TLSTest, MultipleGetDNS)
 {
     try
     {
-        http::response response = client->get("https://example.com");
+        http::response response = client->get(toPing);
         EXPECT_EQ((int)response.status_code, 200) << "Actual status: " << (int)response.status_code;
-        response = client->get("https://example.com");
+        response = client->get(toPing);
         EXPECT_EQ((int)response.status_code, 200) << "Actual status: " << (int)response.status_code;
-        response = client->get("https://example.com");
+        response = client->get(toPing);
         EXPECT_EQ((int)response.status_code, 200) << "Actual status: " << (int)response.status_code;
     }
     catch (std::exception &e)
