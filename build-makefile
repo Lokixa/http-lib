@@ -1,19 +1,13 @@
-
 all: build
-	clear
-	./${executable}
+	ctest --output-on-failure
 
 mem: build
 	clear
-	valgrind --leak-check=full -s ./${executable}
+	valgrind --leak-check=full -s ctest
 
 build: clean
 	ninja
 
 clean:
+	clear
 	ninja -t cleandead
-
-prod: build
-	strip ${executable}
-
-executable = main
